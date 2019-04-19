@@ -52,14 +52,14 @@ function push_to_kafka($id, $post) {
     $body = $post->post_content;
 
     $msg = array(
-         'operation' => 'UPDATE',
-         'message' => array(
-                 'slug' => $slug,
-                 'title' => $title,
-                 'author' => $author_name,
-                 'date' => $date,
-                 'body' => $body
-         )
+        'operation' => 'UPDATE',
+        'message' => array(
+            'slug' => $slug,
+            'title' => $title,
+            'author' => $author_name,
+            'date' => $date,
+            'body' => $body
+        )
     );
 
     $payload = json_encode($msg, JSON_FORCE_OBJECT);
@@ -75,40 +75,40 @@ function push_to_kafka($id, $post) {
 add_action('admin_menu', 'kafka_menu');
 
 function kafka_menu() {
-        //create new top-level menu
-        add_menu_page('Kafka Konfig', 'Kafka', 'administrator', __FILE__, 'kafka_plugin_settings_page' , plugins_url('/images/icon.png', __FILE__) );
+    //create new top-level menu
+    add_menu_page('Kafka Konfig', 'Kafka', 'administrator', __FILE__, 'kafka_plugin_settings_page' , plugins_url('/images/icon.png', __FILE__) );
 
-        //call register settings function
-        add_action('admin_init', 'register_kafka_settings');
+    //call register settings function
+    add_action('admin_init', 'register_kafka_settings');
 }
 
 function register_kafka_settings() {
-        //register our settings
-        register_setting('kafka-plugin-settings-group', 'kafka_brokers');
-        register_setting('kafka-plugin-settings-group', 'kafka_topic');
+    //register our settings
+    register_setting('kafka-plugin-settings-group', 'kafka_brokers');
+    register_setting('kafka-plugin-settings-group', 'kafka_topic');
 }
 
 function kafka_plugin_settings_page() {
-?>
-<div class="wrap">
-<h1>Kafka Konfig yo</h1>
+    ?>
+    <div class="wrap">
+    <h1>Kafka Konfig yo</h1>
 
-<form method="post" action="options.php">
-    <?php settings_fields('kafka-plugin-settings-group'); ?>
-    <?php do_settings_sections('kafka-plugin-settings-group'); ?>
+    <form method="post" action="options.php">
+<?php settings_fields('kafka-plugin-settings-group'); ?>
+<?php do_settings_sections('kafka-plugin-settings-group'); ?>
     <table class="form-table">
-        <tr valign="top">
-        <th scope="row">Brokers</th>
-        <td><input type="text" name="kafka_brokers" value="<?php echo esc_attr( get_option('kafka_brokers') ); ?>" /></td>
-        </tr>
+<tr valign="top">
+<th scope="row">Brokers</th>
+<td><input type="text" name="kafka_brokers" value="<?php echo esc_attr( get_option('kafka_brokers') ); ?>" /></td>
+</tr>
 
-        <tr valign="top">
-        <th scope="row">Topic</th>
-        <td><input type="text" name="kafka_topic" value="<?php echo esc_attr( get_option('kafka_topic') ); ?>" /></td>
-        </tr>
-    </table>
+<tr valign="top">
+<th scope="row">Topic</th>
+<td><input type="text" name="kafka_topic" value="<?php echo esc_attr( get_option('kafka_topic') ); ?>" /></td>
+</tr>
+</table>
 
-    <?php submit_button(); ?>
+<?php submit_button(); ?>
 
 </form>
 </div>
