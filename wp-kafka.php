@@ -27,16 +27,13 @@ function push_to_kafka($id, $post) {
     $logger->pushHandler(new ErrorLogHandler());
 
     try {
-        $kafka_config = \Kafka\ProducerConfig::getInstance();
-        $kafka_config->setMetadataRefreshIntervalMs(10000);
-        $kafka_config->setMetadataBrokerList(get_option('kafka_brokers'));
-        $kafka_config->setBrokerVersion('1.0.0');
-        $kafka_config->setRequiredAck(1);
-        $kafka_config->setIsAsyn(false);
-        $kafka_config->setProduceInterval(150);
-
-        $kafka_producer = new \Kafka\Producer();
-        $kafka_producer->setLogger($logger);
+        $config = \Kafka\ProducerConfig::getInstance();
+        $config->setMetadataRefreshIntervalMs(10000);
+        $config->setMetadataBrokerList(get_option('kafka_brokers'));
+        $config->setBrokerVersion('1.0.0');
+        $config->setRequiredAck(1);
+        $config->setIsAsyn(false);
+        $config->setProduceInterval(500);
     } catch (Throwable $e) {
         error_log($e->getMessage());
 
@@ -48,7 +45,7 @@ function push_to_kafka($id, $post) {
 
     $slug = $post->post_name;
     $title = $post->post_title;
-    $date  = $post->post_date;
+    $date  = get_the_date("Y-m-d\TH:i:sP", $post);
     $body = $post->post_content;
 
     $msg = array(
@@ -63,13 +60,27 @@ function push_to_kafka($id, $post) {
     );
 
     $payload = json_encode($msg, JSON_FORCE_OBJECT);
-    error_log($payload);
+    error_log("Payload: " . $payload);
 
-    $kafka_producer->send([
-        'topic' => get_option('kafka_topic'),
-        'key' => '',
-        'value' => $payload
-    ]);
+    $producer = new \Kafka\Producer(function() use ($payload) {
+        return array(
+            array(
+                'topic' => get_option('kafka_topic'),
+                'value' => $payload,
+                'key' => 'payload',
+            ),
+        );
+    });
+
+    $producer->setLogger($logger);
+
+    $producer->success(function($result) {
+        error_log("Success: " . $result);
+    });
+    $producer->error(function($errorCode) {
+        error_log("Error: " . $errorCode);
+    });
+    $producer->send();
 }
 
 add_action('admin_menu', 'kafka_menu');

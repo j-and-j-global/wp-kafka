@@ -1,6 +1,6 @@
 {
     "require": {
-        "nmred/kafka-php": "v0.2.0.8",
+        "nmred/kafka-php": "dev-master#a8f5b01d9ca24c183b121d624e3402bf8aa70488",
         "monolog/monolog": "^1.24"
     }
 }

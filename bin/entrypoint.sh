@@ -5,6 +5,8 @@ set -axe
 
 DST="/bitnami/wordpress/wp-content/plugins/wp-kafka"
 
+mkdir -p $(dirname ${DST})
+
 [ -d "${DST}" ] && rm -rf ${DST}
 cp -R /wp-kafka "${DST}"
 
