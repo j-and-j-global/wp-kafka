@@ -49,6 +49,8 @@ function push_to_kafka($id, $post) {
     $body = $post->post_content;
 
     $msg = array(
+        'provenance' => 'wordpress',
+        'version' => get_option('wp_kafka_version', '1.0.0'),
         'operation' => 'UPDATE',
         'message' => array(
             'slug' => $slug,
@@ -121,7 +123,7 @@ function kafka_plugin_settings_page() {
 
 <tr valign="top">
 <th scope="row">Payload Version</th>
-<td><input type="text" name="kafka_topic" value="<?php echo esc_attr( get_option('wp_kafka_version', '1.0.0') ); ?>" /></td>
+<td><input type="text" name="kafka_version" value="<?php echo esc_attr( get_option('wp_kafka_version', '1.0.0') ); ?>" /></td>
 </tr>
 
 </table>
