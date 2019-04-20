@@ -29,7 +29,7 @@ function push_to_kafka($id, $post) {
     try {
         $config = \Kafka\ProducerConfig::getInstance();
         $config->setMetadataRefreshIntervalMs(10000);
-        $config->setMetadataBrokerList(get_option('kafka_brokers'));
+        $config->setMetadataBrokerList(get_option('kafka_brokers', 'content-kafka:9092'));
         $config->setBrokerVersion('1.0.0');
         $config->setRequiredAck(1);
         $config->setIsAsyn(false);
@@ -65,7 +65,7 @@ function push_to_kafka($id, $post) {
     $producer = new \Kafka\Producer(function() use ($payload) {
         return array(
             array(
-                'topic' => get_option('kafka_topic'),
+                'topic' => get_option('kafka_topic', 'content'),
                 'value' => $payload,
                 'key' => 'payload',
             ),
@@ -97,6 +97,7 @@ function register_kafka_settings() {
     //register our settings
     register_setting('kafka-plugin-settings-group', 'kafka_brokers');
     register_setting('kafka-plugin-settings-group', 'kafka_topic');
+    register_setting('kafka-plugin-settings-group', 'wp_kafka_version');
 }
 
 function kafka_plugin_settings_page() {
@@ -110,13 +111,19 @@ function kafka_plugin_settings_page() {
     <table class="form-table">
 <tr valign="top">
 <th scope="row">Brokers</th>
-<td><input type="text" name="kafka_brokers" value="<?php echo esc_attr( get_option('kafka_brokers') ); ?>" /></td>
+<td><input type="text" name="kafka_brokers" value="<?php echo esc_attr( get_option('kafka_brokers', 'content-kafka:9092') ); ?>" /></td>
 </tr>
 
 <tr valign="top">
 <th scope="row">Topic</th>
-<td><input type="text" name="kafka_topic" value="<?php echo esc_attr( get_option('kafka_topic') ); ?>" /></td>
+<td><input type="text" name="kafka_topic" value="<?php echo esc_attr( get_option('kafka_topic', 'content') ); ?>" /></td>
 </tr>
+
+<tr valign="top">
+<th scope="row">Payload Version</th>
+<td><input type="text" name="kafka_topic" value="<?php echo esc_attr( get_option('wp_kafka_version', '1.0.0') ); ?>" /></td>
+</tr>
+
 </table>
 
 <?php submit_button(); ?>
